@@ -114,8 +114,6 @@ void CBuilderCommand::Initialize()
 	mData.insert(pair<wstring, CCommandInfo>(L"WHO", Info));
 	Info.Set(L"who_is_online", 1, WhoIsOnline);
 	mData.insert(pair<wstring, CCommandInfo>(L"who_is_online", Info));
-	Info.Set(L"augment_item", 1, AugmentItem);
-	mData.insert(pair<wstring, CCommandInfo>(L"augment_item", Info));
 	Info.Set(L"test_cmd", 1, TestCMD);
 	mData.insert(pair<wstring, CCommandInfo>(L"test_cmd", Info));
 
@@ -1606,69 +1604,6 @@ bool CBuilderCommand::PartyRecall(User *pUser, std::wstring wsParams)
 			}
 		}else
 			pUser->SendSystemMessage(L"Usage: //party_recall [user_name]");
-	}
-	return false;
-}
-
-bool CBuilderCommand::AugmentItem(User *pUser, std::wstring wsParams)
-{
-	//augment_item [item_id] [enchant_level] [aug1_id] [aug2_id]
-	if(pUser->ValidUser())
-	{
-		if(wsParams.size() > 6)
-		{
-			User *pTarget = User::GetUserBySID(&pUser->targetId);
-			if(!pTarget->ValidUser())
-			{
-				pUser->SendSystemMessage(L"Invalid target!");
-				return false;
-			}
-
-			int nItemID, nAug1ID, nAug2ID, nEnchant;
-			wstringstream sstr;
-			sstr << wsParams;
-			sstr >> nItemID >> nEnchant >> nAug1ID >> nAug2ID;
-			if(nItemID > 0)
-			{
-				if(nAug1ID > -1 && nAug1ID < 16345 && nAug2ID > -1 && nAug2ID < 16345)
-				{
-					int nAugmentationID = (nAug2ID << 16) + nAug1ID;
-					CItem *pItem = pTarget->inventory.GetFirstItemByClassID(nItemID);
-					if(pItem->IsValid(VT_ITEMWEAPON))
-					{
-						if(pItem->nAugmentationID == 0 && pItem->pSID->nEnchantLevel == nEnchant)
-						{
-							pItem->nAugmentationID = nAugmentationID;
-							g_DB.RequestSaveItemDataEx(pTarget->nDBID, pItem);
-							pTarget->inventory.SetInventoryChanged(pItem, CInventory::UPDATE);
-						}else
-						{
-							//find our item
-							int nSafeCheck = 0;
-							while((pItem->nAugmentationID != 0 || pItem->pSID->nEnchantLevel != nEnchant) && nSafeCheck < 120)
-							{
-								pItem = pTarget->inventory.GetNextItemByClassID(pItem->pSID->nItemIndex);
-								if(!pItem->IsValidItem())
-									break;
-								nSafeCheck++;
-							}
-							
-							if(pItem->IsValid(VT_ITEMWEAPON))
-							{
-								pItem->nAugmentationID = nAugmentationID;
-								g_DB.RequestSaveItemDataEx(pTarget->nDBID, pItem);
-								pTarget->inventory.SetInventoryChanged(pItem, CInventory::UPDATE);
-							}else
-								pUser->SendSystemMessage(L"Cannot find valid weapon!");
-						}
-					}else
-						pUser->SendSystemMessage(L"Cannot find valid weapon!");
-				}else
-					pUser->SendSystemMessage(L"Invalid augmentation id!");
-			}else
-				pUser->SendSystemMessage(L"Invalid item id!");
-		}else
-			pUser->SendSystemMessage(L"Usage: //augment_item [item_id] [enchant] [aug1_id] [aug2_id]");
 	}
 	return false;
 }

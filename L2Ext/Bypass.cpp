@@ -5,7 +5,6 @@
 #include "ClanSys.h"
 #include "ClassManager.h"
 #include "TvT.h"
-#include "Augmentation.h"
 #include "OfflineShop.h"
 #include "AccountDB.h"
 #include "DB.h"
@@ -58,14 +57,6 @@ bool CBypass::Handled(User *pUser, wstring wBypass)
 					if( wBypass == L"acquire_clan_skill" )
 					{
 						ClanSys::RequestShowPledgeSkillList(pUser);
-						return true;
-					}else if( wBypass == L"augment_item" )
-					{
-						g_Augmentation.ShowAugmentMixWindow(pUser->GetSocket());
-						return true;
-					}else if( wBypass == L"remove_augment" )
-					{
-						g_Augmentation.ShowAugmentRemoveWindow(pUser->GetSocket());
 						return true;
 					}else if( wBypass.find(L"create_academy?") == 0 )
 					{

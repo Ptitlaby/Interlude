@@ -47,7 +47,6 @@
 #include "CAttackAction.h"
 #include "Quests.h"
 #include "SkillMod.h"
-#include "ShadowItem.h"
 #include "PledgeDB.h"
 #include "ResidenceDB.h"
 #include "NpcSocket.h"

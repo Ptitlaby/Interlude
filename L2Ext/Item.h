@@ -186,12 +186,10 @@ public:
 	/* 0048 */ INT64 nUnkn2;
 	/* 0050 */ INT64 nUnkn3;
 	/* 0058 */ INT64 nUnknEtcItem; //Extending CItem;
-	/* 0060 */ UINT nAugmentationID;
-	/* 0064 */ int nManaLeft; //ShadowItem
 	/* 0068 */ int nLifeTime; //time when item will disappear
 	/* 006C */ UINT nProtectionTimeout;	//item protection timeout timestamp
 public:
-	void Clear(){ this->nManaLeft = 0; this->nAugmentationID = 0; this->nProtectionTimeout = 0; };
+	void Clear(){ this->nProtectionTimeout = 0; };
 	bool IsValidItem();
 	CSharedItemData *GetSharedData();
 	CWeapon *GetWeapon();

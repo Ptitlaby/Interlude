@@ -410,18 +410,6 @@
 				</File>
 			</Filter>
 			<Filter
-				Name="Augmentation"
-				>
-				<File
-					RelativePath=".\Augmentation.cpp"
-					>
-				</File>
-				<File
-					RelativePath=".\Augmentation.h"
-					>
-				</File>
-			</Filter>
-			<Filter
 				Name="ManorFix"
 				>
 				<File

@@ -2,7 +2,6 @@
 #include "CursedWeaponSystem.h"
 #include "UserExPacket.h"
 #include "ClanSys.h"
-#include "Augmentation.h"
 #include "InfinityShot.h"
 #include "MPCC.h"
 #include "DuelSystem.h"
@@ -237,36 +236,6 @@ bool CUserExPacket::Handle(CUserSocket *pSocket, const unsigned char* packet)
 				return g_DuelSystem.RequestAnswerDuel(pSocket, packet);
 			}
 			return false;
-			break;
-		}
-	case 0x29: //RequestConfirmTargetItem - Augmentation
-		{
-			return g_Augmentation.RequestConfirmTargetItem(pSocket, packet);
-			break;
-		}
-	case 0x2A: //RequestConfirmRefinerItem - Augmentation
-		{
-			return g_Augmentation.RequestConfirmRefinerItem(pSocket, packet);
-			break;
-		}
-	case 0x2B: //RequestConfirmGemStone
-		{
-			return g_Augmentation.RequestConfirmGemStone(pSocket, packet);
-			break;
-		}
-	case 0x2C:	//Augment Weapon
-		{
-			return g_Augmentation.RequestAugmentItem(pSocket, packet);
-			break;
-		}
-	case 0x2D: //RequestConfirmCancelItem
-		{
-			return g_Augmentation.RequestConfirmCancelItem(pSocket, packet);
-			break;
-		}
-	case 0x2E:
-		{
-			return g_Augmentation.RequestCancelItem(pSocket, packet);
 			break;
 		}
 	case 0x2F:

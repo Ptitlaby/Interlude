@@ -15,7 +15,6 @@
 #include "ClassManager.h"
 #include "TeleportBypass.h"
 #include "TvT.h"
-#include "Augmentation.h"
 #include "AutoLearn.h"
 #include "MiningSystem.h"
 #include "CursedWeaponSystem.h"
@@ -195,12 +194,7 @@ void CPostLoad::FirstLoad(LPVOID Instance)
 
 	g_Log.Add(CLog::Blue, "[Ext] Initializing Enchanted Set System");
 	g_EnchantedSet.Initialize();
-	g_Log.Add(CLog::Blue, "[Ext] Loading Augmentation Data");
-	g_Augmentation.ReadStatData();
-	g_Augmentation.ReadSkillData();
-	g_Augmentation.ReadNameData();
-	g_Log.Add(CLog::Blue, "[Ext] Augmenation : BlockedGlows[%d] BlockedItems[%d]", g_Config.AugmentationInfo.GetBlockedGlowCount(), g_Config.AugmentationInfo.GetBlockedItemCount());
-	
+
 	g_SkillDBEx.Initialize();
 	g_NpcDb.Init();
 	g_UserDB.Initialize();

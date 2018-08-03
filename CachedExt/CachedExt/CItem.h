@@ -29,8 +29,6 @@ public:
 	/* 04C */	DWORD nUnk04C;
 	/* 050 */	DWORD nUnk050;
 	/* 054 */	DWORD nUnk054;
-//	/* 058 */	DWORD nAugmentationID;
-//	/* 05C */	DWORD nManaLeft;
 public:
 	bool Save(bool bForceSave)
 	{

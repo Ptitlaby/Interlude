@@ -124,40 +124,6 @@ public:
 		BYTE AllySize;
 		int nWarDelay;
 	} ClanInfo;
-	class CAugmentationInfo
-	{
-	public:
-		enum LIFE_STONE
-		{
-			LOW,
-			MID,
-			HIGH,
-			TOP
-		};
-		CAugmentationInfo() { memset(BaseStatChance, 0, sizeof(BaseStatChance)); memset(SkillChance, 0, sizeof(SkillChance)); }
-		void SetBaseStatChance(LIFE_STONE Type, int Value) { BaseStatChance[Type] = Value; };
-		int GetBaseStatChance(LIFE_STONE Type) { return BaseStatChance[Type]; };
-		void SetSkillChance(LIFE_STONE Type, int Value) { SkillChance[Type] = Value; };
-		int GetSkillChance(LIFE_STONE Type) { return SkillChance[Type]; };
-		void AddBlockedItem(int ItemID) { lBlockedItem.push_back(ItemID); };
-		bool IsBlockedItem(int ItemID) { for(list<int>::iterator Iter = lBlockedItem.begin();Iter!=lBlockedItem.end();Iter++) { if(*Iter == ItemID) return true; }return false; };
-		int GetBlockedItemCount() { return (int)lBlockedItem.size(); };
-		void AddBlockedGlow(int ItemID) { lBlockedGlow.push_back(ItemID); };
-		bool IsBlockedGlow(int ItemID) { for(list<int>::iterator Iter = lBlockedGlow.begin();Iter!=lBlockedGlow.end();Iter++) { if(*Iter == ItemID) return true; }return false; };
-		int GetBlockedGlowCount() { return (int)lBlockedGlow.size(); };
-		void SetDispelOnPassive(bool Value) { DispelOnPassive = Value; };
-		bool IsDispelOnPassive() { return DispelOnPassive; };
-		void SetDispelOnAttribute(bool Value) { DispelOnAttribute = Value; };
-		bool IsDispelOnAttribute() { return DispelOnAttribute; };
-		void Load();
-	private:
-		list<int> lBlockedItem;
-		list<int> lBlockedGlow;
-		int BaseStatChance[4];
-		int SkillChance[4];
-		bool DispelOnPassive;
-		bool DispelOnAttribute;
-	} AugmentationInfo;
 	class CLogInfo
 	{
 	public:

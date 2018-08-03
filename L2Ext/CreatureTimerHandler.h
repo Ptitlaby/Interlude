@@ -38,21 +38,17 @@ public:
 		CRASH,
 		USER_SEND_SPIRIT_STATUS,
 		USER_SEND_ERA_MOON,
-		DISPEL_AUGMENTATION,
 		USER_VALIDATE_ACQUIRED_SKILLS,
 		VALIDATE_CLIENT_COUNT,
 		VALIDATE_ITEM_REUSE,
 		VALIDATE_STATS,
-		USER_RESET_PVP_FLAG,
-		USER_SHADOW_ITEM_START = -1000000
+		USER_RESET_PVP_FLAG
 	};
 	void AddTimer(int ID, int Time);
 	void DelTimer(int ID);
 	void TimerExpired(CCreature *pCreature);
 	void Handle(int ID, CCreature *pCreature);
 	void HandleCrash(CCreature *pCreature);
-	void HandleUserShadowItem(CCreature *pCreature, int ID);
-	void HandleUserDispelAugmentation(CCreature *pCreature);
 	void HandleUserSendEraMoon(CCreature *pCreature);
 	void HandleUserSendSpiritStatus(CCreature *pCreature);
 	void HandleUserDismountWyvern(CCreature *pCreature);

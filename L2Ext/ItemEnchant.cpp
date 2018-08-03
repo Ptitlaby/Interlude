@@ -204,13 +204,6 @@ bool CItemEnchant::EnchantItem(CItem *pScroll, CItem *pItem, User *pUser)
 			return true;
 		}
 
-		if(pItem->nManaLeft > 0)
-		{
-			pUser->SendSystemMessage(L"You cannot enchant this item.");
-			CancelEnchant(pUser);
-			return true;
-		}
-
 		map<INT32, CustomEnchantData>::iterator scrollIter = g_CustomEnchant.find(pScroll->pSID->nItemID);
 		if(scrollIter != g_CustomEnchant.end())
 		{

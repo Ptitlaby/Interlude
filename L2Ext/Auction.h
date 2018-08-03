@@ -6,7 +6,6 @@ struct AuctionItem
 	WCHAR sellerName[25];
 	int itemClassId;
 	int itemEnchant;
-	Augmentation itemAugmentation;
 	int itemAmount;
 	int itemPrice;
 	UINT auctionTimeoutTime;
@@ -40,7 +39,7 @@ public:
 	bool RequestSelectAuctionItem(User *pUser);
 	bool HandleSelectedItem(User *pUser, UINT itemServerId);
 	bool RequestSetAuction(User *pUser, INT32 price, INT32 amount);
-	bool Create(UINT sellerId, const WCHAR* sellerName, UINT auctionId, INT32 itemId, INT32 amount, INT32 enchant, UINT augmentation, INT32 price, UINT expireTime, bool loadOnly = false);
+	bool Create(UINT sellerId, const WCHAR* sellerName, UINT auctionId, INT32 itemId, INT32 amount, INT32 enchant, INT32 price, UINT expireTime, bool loadOnly = false);
 	bool RequestSetBuyItem(User *pUser, UINT auctionId);
 	bool RequestConfirmBuy(User *pUser, UINT auctionId, INT32 amount);
 	bool RequestBuy(User *pUser, UINT auctionId, INT32 amount);

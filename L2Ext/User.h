@@ -589,8 +589,6 @@ public:
 	void Ride(CCreature *pCreature);
 	void RideWyvern(int wyvernClassId, int level);
 	UINT GetPledgeClass();
-	int GetAugmentationID();
-	int GetAugmentationID(int nItemIndex);
 	void DespawnPet(bool byLeaveWorld);
 	void PlaySound(PWCHAR wszName, int nCount, int nObjectID, int x, int y, int z);
 	void OnDieDropItem(bool bDieOnBattleField);

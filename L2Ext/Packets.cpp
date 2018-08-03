@@ -132,22 +132,8 @@ int CPacketFix::AssembleShortCutInfo(PCHAR lpBuff, int len, PCSTR format, ...)
 		case ShortCutItem:
 			{
 				INT32 param = va_arg(vl, INT32);
-				//Augmentation augmentation;
-				//int reuseGroup = -1;
-				//int reuse = 0;
 
-				//CItem *pItem = (CItem*)CObject::GetObjectBySID(id);
-				//if(pItem->IsValidItem())
-				//{
-					//augmentation.Full = pItem->nAugmentationID;
-					//CItemDataEx *pEx = g_ItemDBEx.GetItemDataEx(pItem->pSID->nItemID);
-				//	if(pEx)
-				//	{
-				//		reuseGroup = pEx->GetReuseGroup();
-				//	}
-				//}
-
-				ret = Assemble(lpBuff, len, "dddd"/*dddhh"*/, Type, slot, id, param/*, reuseGroup, reuse, 0, augmentation.Part.effectA, augmentation.Part.effectB*/);
+				ret = Assemble(lpBuff, len, "dddd", Type, slot, id, param);
 				break;
 			}
 		case ShortCutAction:

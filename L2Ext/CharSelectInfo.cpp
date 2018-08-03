@@ -108,9 +108,6 @@ void CPacketFix::CharSelectInfoFix(CUserSocket *pSocket, const char *szFormat, B
 			/*d*/ NewPacket.WriteD(OldPacket.ReadD()); // last used
 			/*c*/ NewPacket.WriteC(OldPacket.ReadC()); // enchant effect
 
-			UINT augmentation = OldPacket.ReadD();
-			/*d - new*/ //NewPacket.WriteD(augmentation); //Augmentation ID
-
 			/*d*/ NewPacket.WriteD(nFaceDBID); //Face Slot dbid
 			
 			/*d*/ NewPacket.WriteD(nFaceItemType); //Face slot type

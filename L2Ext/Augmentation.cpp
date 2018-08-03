@@ -246,8 +246,6 @@ bool CAugmentation::CheckItemID(int nItemID)
 			if(g_Config.AugmentationInfo.IsBlockedItem(nItemID))
 				return false;
 		}
-		if(CShadowItem::IsShadowItem(nItemID))
-			return false;
 		return true;
 	}else
 		return false;
@@ -1207,10 +1205,6 @@ void CAugmentation::MultiSellAddItem(User *pUser, CItem *pItem)
 			{
 				pItem->nProtectionTimeout = pUser->pSD->nProtectionTimeoutTmp;
 				pUser->pSD->nProtectionTimeoutTmp = 0;
-				save = true;
-			}
-			if(pItem->nManaLeft != 0)
-			{
 				save = true;
 			}
 			if(save)

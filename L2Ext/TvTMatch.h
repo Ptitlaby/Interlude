@@ -71,7 +71,6 @@ namespace TvT
 		vector<SkillPchId> defaultMageBuffs;
 		vector<SkillPchId> defaultFighterBuffs;
 		bool blockedCrystalType[10];
-		BOOL blockAugmentation;
 		BOOL blockAttribute;
 		INT32 maxArmorEnchant;
 		INT32 maxWeaponEnchant;

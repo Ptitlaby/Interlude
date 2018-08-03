@@ -54,7 +54,6 @@ public:
 	static bool PartyRecall(User *pUser, wstring wsParams);
 	static bool Who(User *pUser, wstring wsParams);
 	static bool WhoIsOnline(User *pUser, wstring wsParams);
-	static bool AugmentItem(User *pUser, wstring wsParams);
 	static bool EnchantItem(User *pUser, wstring wsParams);
 	static bool SetPendingWriteLimit(User *pUser, wstring wsParams);
 	static bool TestCMD(User *pUser, wstring wsParams);

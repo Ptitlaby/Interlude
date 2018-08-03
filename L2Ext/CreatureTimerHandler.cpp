@@ -129,11 +129,6 @@ void CCreatureTimerHandler::Handle(int ID, CCreature *pCreature)
 					HandleUserSendEraMoon(pCreature);
 					break;
 				}
-			case DISPEL_AUGMENTATION:
-				{
-					HandleUserDispelAugmentation(pCreature);
-					break;
-				}
 			case USER_VALIDATE_ACQUIRED_SKILLS:
 				{
 					HandleUserValidateAcquiredSkills(pCreature);
@@ -151,11 +146,6 @@ void CCreatureTimerHandler::Handle(int ID, CCreature *pCreature)
 				}
 			default:
 				{
-					if(ID < USER_SHADOW_ITEM_START)
-					{
-						HandleUserShadowItem(pCreature, ID);
-						break;
-					}
 					g_Log.Add(CLog::Error, "[%s] Not Handled Timer ID[%d]", __FUNCTION__, ID);
 					break;
 				}
@@ -180,22 +170,6 @@ void CCreatureTimerHandler::HandleUserValidateAcquiredSkills(CCreature *pCreatur
 	if(User *pUser = pCreature->GetUser())
 	{
 		pUser->ValidateAcquiredSkills();
-	}
-}
-
-void CCreatureTimerHandler::HandleUserShadowItem(CCreature *pCreature, int ID)
-{
-	if(User *pUser = pCreature->GetUser())
-	{
-		CShadowItem::TimerExpired(pUser, ID);
-	}
-}
-
-void CCreatureTimerHandler::HandleUserDispelAugmentation(CCreature *pCreature)
-{
-	if(User *pUser = pCreature->GetUser())
-	{
-		pUser->DispelByAbnormal(177, true);
 	}
 }
 

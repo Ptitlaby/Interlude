@@ -1490,17 +1490,12 @@ bool DropItem(CUserSocket *pSocket, const unsigned char* packet)
 			if(nCount > 0)
 			{
 				CItem *pItem = pUser->inventory.GetItemBySID(nObjectID);
-				if(pItem->IsValidItem() && pItem->nAugmentationID)
+				if(pItem->IsValidItem() && pItem->nProtectionTimeout > time(0))
 				{
-					if(pItem->nProtectionTimeout > time(0))
-					{
-						pSocket->SendSystemMessage(L"This item is protected and cannot be dropped!");
-					}else
-					{
-						pSocket->SendSystemMessage(L"You cannot drop this item.");
-					}
+					pSocket->SendSystemMessage(L"This item is protected and cannot be dropped!");
 					ret = false;
-				}else
+				}
+				else
 				{
 					ret = _SockFunc(0x0086CE20L)(pSocket, packet);
 				}
@@ -1648,7 +1643,7 @@ bool GiveItemToPet(CUserSocket *pSocket, const unsigned char* packet)
 								}
 							}
 
-							if(pItem->nAugmentationID || pItem->nProtectionTimeout > time(0) || !allowed)
+							if(pItem->nProtectionTimeout > time(0) || !allowed)
 							{
 								//2502	1	a,You cannot give this item to pet!\0	0	79	9B	B0	FF	a,	a,	0	0	0	0	0	a,	a,none\0
 								pSocket->SendSystemMessage(2502);
@@ -2445,7 +2440,7 @@ bool PrivateStoreListSet(CUserSocket *pSocket, const unsigned char* packet)
 				
 				if(CItem *pItem = CObject::GetObjectBySID(nItemSID)->SafeCastItem())
 				{
-					if(pItem->nAugmentationID || pItem->nProtectionTimeout > time(0))
+					if(pItem->nProtectionTimeout > time(0))
 					{
 						pSocket->SendSystemMessage(L"You cannot sell that item.");
 						pUser->QuitPrivateStore();
@@ -2689,7 +2684,7 @@ bool RequestPackageSend(CUserSocket *pSocket, const unsigned char* packet)
 							CItem *pItem = pUser->GetInventory()->GetItemByDBID(nItemID);
 							if(pItem->IsValidItem())
 							{
-								if(pItem->nAugmentationID || pItem->nProtectionTimeout > time(0) || pItem->nLifeTime > 0)
+								if(pItem->nProtectionTimeout > time(0) || pItem->nLifeTime > 0)
 								{
 									//This item cannot be moved to warehouse
 									pSocket->SendSystemMessage(L"You cannot deposit this items.");
@@ -3452,7 +3447,7 @@ bool TradeAddItems(CUserSocket *pSocket, const unsigned char* packet)
 							return false;
 						}
 
-						if(pItem->nAugmentationID != 0 || pItem->nLifeTime != 0 || pItem->nProtectionTimeout != 0 )
+						if(pItem->nLifeTime != 0 || pItem->nProtectionTimeout != 0 )
 						{
 							pUser->SendSystemMessage(L"You cannot trade this item!");
 							unguard;
