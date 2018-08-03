@@ -859,14 +859,32 @@ void COtherAction::AmpedDeleteItem(LPVOID pInstance, CItem *pItem)
 CItem* OnLoadItem(const unsigned char* packet, const char *format, int *pItemDBID, int *pItemType, int *pAmount, int *pEnchant, int *pEroded, int *pBless, int *pIdent, int *pWished)
 {
 	typedef CItem*(*f)(INT64, int);
+	int nAugmentationID = 0;
+	int nManaLeft = 0;
 	int nLifeTime = 0;
 	UINT nProtectionTimeout = 0;
 
-	packet = Disassemble(packet, "dddddddddd", pItemDBID, pItemType, pAmount, pEnchant, pEroded, pBless, pIdent, pWished, &nLifeTime, &nProtectionTimeout);
+	packet = Disassemble(packet, "dddddddddddd", pItemDBID, pItemType, pAmount, pEnchant, pEroded, pBless, pIdent, pWished, &nAugmentationID, &nManaLeft, &nLifeTime, &nProtectionTimeout);
 
 	CItem *pItem = f(0x6FAB60L)(0x0BC5D810, *pItemType);
 	if(pItem->IsValidItem())
 	{
+		if(CShadowItem::IsShadowItem(*pItemType))
+		{
+			pItem->nManaLeft = nManaLeft;
+		}else
+		{
+			pItem->nManaLeft = 0;
+		}
+		
+		if(pItem->GetWeapon())
+		{
+			pItem->nAugmentationID = nAugmentationID;
+		}else
+		{
+			pItem->nAugmentationID = 0;
+		}
+
 		if(nLifeTime == 0)
 		{
 			if(UINT lifeTime = g_ItemDBEx.GetLifeTime(*pItemType))
@@ -879,19 +897,24 @@ CItem* OnLoadItem(const unsigned char* packet, const char *format, int *pItemDBI
 		}
 		pItem->nLifeTime = nLifeTime;
 		pItem->nProtectionTimeout = nProtectionTimeout;
+	//	g_Log.Add(CLog::Blue, "[%s] Loading and setting Augmentation[%d] ManaLeft[%d]", __FUNCTION__, nAugmentationID, nManaLeft);
 	}
 	return pItem;
 }
 
 int OnSaveItem(PCHAR packet, int nSize, CItem *pItem, int nItemDBID, int nCharDBID, int nItemType, int nAmount, int nEnchant, int nEroded, int nBless, int nIdent, int nWished, int nWarehouse)
 {
+	int nAugmentationID = 0;
+	int nManaLeft = 0;
 	int nLifeTime = 0;
 	UINT nProtectionTimeout = 0;
 	if(pItem->IsValidItem())
 	{
+		nAugmentationID = pItem->nAugmentationID;
+		nManaLeft = pItem->nManaLeft;
 		nLifeTime = pItem->nLifeTime;
 		nProtectionTimeout = pItem->nProtectionTimeout;
 	}
-	return Assemble(packet, nSize, "dddddddddddd", nItemDBID, nCharDBID, nItemType, nAmount, nEnchant, nEroded, nBless, nIdent, nWished, nWarehouse, nLifeTime, nProtectionTimeout);
+	return Assemble(packet, nSize, "dddddddddddddd", nItemDBID, nCharDBID, nItemType, nAmount, nEnchant, nEroded, nBless, nIdent, nWished, nWarehouse, nAugmentationID, nManaLeft, nLifeTime, nProtectionTimeout);
 }
 

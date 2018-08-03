@@ -225,7 +225,7 @@ void CDB::RequestSaveItemDataEx(UINT charId, CItem *pItem)
 {
 	if(charId && pItem)
 	{
-		Send("chdddd", 0xF9, CI_SAVE_ITEM_DATA_EX, charId, pItem->pSID->nDBID, pItem->nLifeTime, pItem->nProtectionTimeout);
+		Send("chdddddd", 0xF9, CI_SAVE_ITEM_DATA_EX, charId, pItem->pSID->nDBID, pItem->nAugmentationID, pItem->nManaLeft, pItem->nLifeTime, pItem->nProtectionTimeout);
 	}
 }
 
@@ -622,9 +622,9 @@ void CDB::RequestSaveSubjob(UINT charId, INT32 subjobId, double hp, double mp, i
 	Send("chddffdddddd", 0xF9, CI_REQUEST_SAVE_SUBJOB, charId, subjobId, hp, mp, exp, sp, level, henna1, henna2, henna3);
 }
 
-void CDB::RequestCreateAuction(UINT sellerId, const WCHAR* wSeller, int itemId, int amount, int enchant, int price, UINT expireTime)
+void CDB::RequestCreateAuction(UINT sellerId, const WCHAR* wSeller, int itemId, int amount, int enchant, UINT augmentation, int price, UINT expireTime)
 {
-	Send("chdSddddd", 0xF9, CI_REQUEST_CREATE_AUCTION, sellerId, wSeller, itemId, amount, enchant, price, expireTime);
+	Send("chdSdddddd", 0xF9, CI_REQUEST_CREATE_AUCTION, sellerId, wSeller, itemId, amount, enchant, augmentation, price, expireTime);
 }
 
 void CDB::RequestModdifyAuctionAmount(UINT auctionId, int newAmount)
@@ -1315,24 +1315,24 @@ bool CDBPacket::ReplyAuctionPaymentAsk(CDBSocket *pSocket, const unsigned char* 
 
 bool CDBPacket::ReplyLoadAuctionItem(CDBSocket *pSocket, const unsigned char* packet, UINT packetId)
 {
-	UINT sellerId = 0, auctionId = 0, expireTime = 0;
+	UINT sellerId = 0, auctionId = 0, augmentation = 0, expireTime = 0;
 	INT32 itemId = 0, amount = 0, enchant = 0, price = 0;
 	WCHAR sellerName[25];
-	Disassemble(packet, "dSdddddd", &sellerId, sizeof(sellerName), sellerName, &auctionId, &itemId, &amount, &enchant, &price, &expireTime);
+	Disassemble(packet, "dSddddddd", &sellerId, sizeof(sellerName), sellerName, &auctionId, &itemId, &amount, &enchant, &augmentation, &price, &expireTime);
 
-	g_Auction.Create(sellerId, sellerName, auctionId, itemId, amount, enchant, price, expireTime, true);
+	g_Auction.Create(sellerId, sellerName, auctionId, itemId, amount, enchant, augmentation, price, expireTime, true);
 
 	return false;
 }
 
 bool CDBPacket::ReplyCreateAuction(CDBSocket *pSocket, const unsigned char* packet, UINT packetId)
 {
-	UINT sellerId = 0, auctionId = 0, expireTime = 0;
+	UINT sellerId = 0, auctionId = 0, augmentation = 0, expireTime = 0;
 	INT32 itemId = 0, amount = 0, enchant = 0, price = 0;
 	WCHAR sellerName[25];
-	Disassemble(packet, "dSdddddd", &sellerId, sizeof(sellerName), sellerName, &auctionId, &itemId, &amount, &enchant, &price, &expireTime);
+	Disassemble(packet, "dSddddddd", &sellerId, sizeof(sellerName), sellerName, &auctionId, &itemId, &amount, &enchant, &augmentation, &price, &expireTime);
 
-	g_Auction.Create(sellerId, sellerName, auctionId, itemId, amount, enchant, price, expireTime, false);
+	g_Auction.Create(sellerId, sellerName, auctionId, itemId, amount, enchant, augmentation, price, expireTime, false);
 
 	return false;
 }

@@ -46,6 +46,17 @@ struct FAngle
 	int heading;
 };
 
+union Augmentation
+{
+	struct 
+	{
+		WORD effectA;
+		WORD effectB;
+	}Effect;
+	DWORD Full;
+	Augmentation() : Full(0) {};
+};
+
 union SkillPchId
 {
 	UINT pchId;

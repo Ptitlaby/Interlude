@@ -318,6 +318,7 @@ void CTvT::LoadINI()
 				}
 			}
 
+			pInfo->blockAugmentation = GetPrivateProfileInt(sectionEx.str().c_str(), _T("BlockAugmentation"), 0, g_TvTFile);
 			pInfo->blockAttribute = GetPrivateProfileInt(sectionEx.str().c_str(), _T("BlockAttribute"), 0, g_TvTFile);
 			pInfo->maxArmorEnchant = GetPrivateProfileInt(sectionEx.str().c_str(), _T("MaxArmorEnchant"), 0, g_TvTFile);
 			pInfo->maxWeaponEnchant = GetPrivateProfileInt(sectionEx.str().c_str(), _T("MaxWeaponEnchant"), 0, g_TvTFile);
@@ -1104,6 +1105,9 @@ bool CTvT::CanUse(CItem *pItem)
 				if(m_lpEvent->m_lpInfo->blockedCrystalType[pItem->pII->nCrystalType])
 					return false;
 			}
+
+			if(m_lpEvent->m_lpInfo->blockAugmentation && pItem->nAugmentationID)
+				return false;
 
 			if(pItem->pSID->nItemType == 0 && m_lpEvent->m_lpInfo->maxWeaponEnchant > 0)
 			{

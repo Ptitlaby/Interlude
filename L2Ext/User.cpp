@@ -744,6 +744,52 @@ void User::RideWyvern(int wyvernClassId, int level)
 	f(0x833E40L)(this, wyvernClassId, level);
 }
 
+int User::GetAugmentationID()
+{
+	if(ValidUser())
+	{
+		try
+		{
+			CSharedItemData *pData = this->GetEquipedWeapon();
+			if(pData)
+			{
+				CWeapon *pWeapon = inventory.GetItemByIndex(pData->nItemIndex)->GetWeapon();
+				if(pWeapon)
+				{
+					if(g_Config.AugmentationInfo.GetBlockedGlowCount() > 0)
+					{
+						int nItemID = pData->nItemID;
+						if(g_Config.AugmentationInfo.IsBlockedGlow(nItemID))
+							return NULL;
+					}
+					return pWeapon->nAugmentationID;
+				}
+			}
+		}catch(...)
+		{
+			g_Log.Add(CLog::Error, "[%s] Exception!",__FUNCTION__);
+		}
+	}
+	return NULL;
+}
+
+int User::GetAugmentationID(int nItemIndex)
+{	
+	if(this)
+	{
+		try
+		{
+			CItem *pItem = inventory.GetItemByIndex(nItemIndex);
+			if(pItem)
+				return pItem->nAugmentationID;
+		}catch(...)
+		{
+			return NULL;
+		}
+	}
+	return NULL;
+}
+
 int User::GetPledgeType()
 {
 	if(ValidUser())

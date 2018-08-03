@@ -1587,6 +1587,7 @@ bool PacketHandler::RequestLoadAuctionItems(CQuerySocket *pSocket, const unsigne
 		INT32 itemId;
 		INT32 amount;
 		INT32 enchant;
+		UINT augmentation;
 		INT32 price;
 		UINT expireTime;
 	};
@@ -1602,6 +1603,7 @@ bool PacketHandler::RequestLoadAuctionItems(CQuerySocket *pSocket, const unsigne
 	pCon->Bind(&ai.itemId);
 	pCon->Bind(&ai.amount);
 	pCon->Bind(&ai.enchant);
+	pCon->Bind(&ai.augmentation);
 	pCon->Bind(&ai.price);
 	pCon->Bind(&ai.expireTime);
 
@@ -1618,7 +1620,7 @@ bool PacketHandler::RequestLoadAuctionItems(CQuerySocket *pSocket, const unsigne
 	{
 		for(map<UINT, AuctionItem>::iterator it = items.begin(); it != items.end(); it++)
 		{
-			pSocket->Send("cddSdddddd", 0x22, CO_REPLY_LOAD_AUCTION_ITEM, it->second.sellerId, it->second.sellerName, it->first, it->second.itemId, it->second.amount, it->second.enchant, it->second.price, it->second.expireTime);
+			pSocket->Send("cddSddddddd", 0x22, CO_REPLY_LOAD_AUCTION_ITEM, it->second.sellerId, it->second.sellerName, it->first, it->second.itemId, it->second.amount, it->second.enchant, it->second.augmentation, it->second.price, it->second.expireTime);
 		}
 	}
 	unguard;
@@ -1628,18 +1630,19 @@ bool PacketHandler::RequestLoadAuctionItems(CQuerySocket *pSocket, const unsigne
 bool PacketHandler::RequestCreateAuction(CQuerySocket *pSocket, const unsigned char* packet)
 {
 	guard;
-	UINT sellerId = 0, expireTime = 0;
+	UINT sellerId = 0, augmentation = 0, expireTime = 0;
 	WCHAR sellerName[25];
 	INT32 itemId = 0, amount = 0, enchant = 0, price = 0;
-	Disassemble(packet, "dSddddd", &sellerId, sizeof(sellerName), sellerName, &itemId, &amount, &enchant, &price, &expireTime);
+	Disassemble(packet, "dSdddddd", &sellerId, sizeof(sellerName), sellerName, &itemId, &amount, &enchant, &augmentation, &price, &expireTime);
 	UINT auctionId = 0;
 
-	CQuery query(L"EXEC lin_AuctionCreate ?, '?', ?, ?, ?, ?, ?");
+	CQuery query(L"EXEC lin_AuctionCreate ?, '?', ?, ?, ?, ?, ?, ?");
 	query.AddParam(sellerId);
 	query.AddParam(sellerName);
 	query.AddParam(itemId);
 	query.AddParam(amount);
 	query.AddParam(enchant);
+	query.AddParam(augmentation);
 	query.AddParam(price);
 	query.AddParam(expireTime);
 
@@ -1651,7 +1654,7 @@ bool PacketHandler::RequestCreateAuction(CQuerySocket *pSocket, const unsigned c
 	}
 	delete pConn;
 
-	pSocket->Send("cddSdddddd", 0x22, CO_REPLY_CREATE_AUCTION, sellerId, sellerName, auctionId, itemId, amount, enchant, price, expireTime);
+	pSocket->Send("cddSddddddd", 0x22, CO_REPLY_CREATE_AUCTION, sellerId, sellerName, auctionId, itemId, amount, enchant, augmentation, price, expireTime);
 	unguard;
 	return false;
 }
@@ -3043,11 +3046,15 @@ void PacketHandler::SendReplyToLoadPledge(CPledge *pPledge, CSocket *pSocket)
 bool __cdecl PacketHandler::RequestSaveItemDataEx(CQuerySocket *pQuerySocket, const unsigned char* packet)
 {
 	UINT charId = 0;
-	INT32 itemId = 0, lifeTime = 0, protectionTimeout = 0;
-	packet = Disassemble(packet, "dddd", &charId, &itemId, &lifeTime, &protectionTimeout );
+	INT32 itemId = 0, manaLeft = 0, lifeTime = 0, protectionTimeout = 0;
+	UINT augmentation = 0;
+	//Send("chdddddd", 0xF9, CI_SAVE_ITEM_DATA_EX, charId, pItem->pSID->nDBID, pItem->nAugmentationID, pItem->nManaLeft, pItem->nLifeTime, pItem->nProtectionTimeout);
+	packet = Disassemble(packet, "dddddd", &charId, &itemId, &augmentation, &manaLeft, &lifeTime, &protectionTimeout );
 	if(charId && itemId)
 	{
-		CQuery query(L"UPDATE [user_item] SET [life_time] = ?, [protection_timeout] = ? WHERE [item_id] = ? AND [char_id] = ?");
+		CQuery query(L"UPDATE [user_item] SET [augmentation] = ?, [mana_left] = ?, [life_time] = ?, [protection_timeout] = ? WHERE [item_id] = ? AND [char_id] = ?");
+		query.AddParam(augmentation);
+		query.AddParam(manaLeft);
 		query.AddParam(lifeTime);
 		query.AddParam(protectionTimeout);
 		query.AddParam(itemId);
@@ -3227,27 +3234,36 @@ bool __cdecl PacketHandler::RequestEnchantItem(CQuerySocket *pQuerySocket, const
 
 int PacketHandler::AssembleItemPacket(PCHAR Buff, int Len, const char* format, int ItemDBID, int ItemType, int Amount, int Enchant, int Eroded, int Bless, int Ident, int Wished)
 {
+	int ManaLeft = 0;
+	int Augmentation = 0;
 	int LifeTime = 0;
 	int ProtectionTimeout = 0;
 	DBConn *pDBConn = new DBConn;
+	pDBConn->Bind(&Augmentation);
+	pDBConn->Bind(&ManaLeft);
 	pDBConn->Bind(&LifeTime);
 	pDBConn->Bind(&ProtectionTimeout);
-	if(pDBConn->Execute(L"SELECT [life_time], [protection_timeout] from [user_item] where [item_id] = %d", ItemDBID))
+	if(pDBConn->Execute(L"SELECT [augmentation], [mana_left], [life_time], [protection_timeout] from [user_item] where [item_id] = %d", ItemDBID))
 	{
 		pDBConn->Fetch();
 	};
 	delete pDBConn;
-	return Assemble(Buff, Len, "dddddddddd", ItemDBID, ItemType, Amount, Enchant, Eroded, Bless, Ident, Wished, LifeTime, ProtectionTimeout );
+//	g_Log.AddU(CLog::Blue, L"[LoadItems] AugmentationID[%d] manaLeft[%d] ItemID[%d]", Augmentation, ManaLeft, ItemDBID);
+	return Assemble(Buff, Len, "dddddddddddd", ItemDBID, ItemType, Amount, Enchant, Eroded, Bless, Ident, Wished, Augmentation, ManaLeft, LifeTime, ProtectionTimeout );
 }
 
 const unsigned char* PacketHandler::DisassembleSaveItemPacket(const unsigned char* packet, const char *format, LPINT pItemDBID, LPINT pCharID, LPINT pItemType, LPINT pAumount, LPINT pEnchant, LPINT pEroded, LPINT pBless, LPINT pIdent, LPINT pWished, LPINT pWarehouse)
 {
+	int nAugmentationID;
+	int nManaLeft;
 	int nLifeTime;
 	int nProtectionTimeout;
 
-	const unsigned char* Ret = Disassemble(packet, "dddddddddddd", pItemDBID, pCharID, pItemType, pAumount, pEnchant, pEroded, pBless, pIdent, pWished, pWarehouse, &nLifeTime, &nProtectionTimeout);
+	const unsigned char* Ret = Disassemble(packet, "dddddddddddddd", pItemDBID, pCharID, pItemType, pAumount, pEnchant, pEroded, pBless, pIdent, pWished, pWarehouse, &nAugmentationID, &nManaLeft, &nLifeTime, &nProtectionTimeout);
 
-	CQuery query(L"UPDATE [user_item] SET [life_time] = ?, [protection_timeout] = ? WHERE [item_id] = ? AND [char_id] = ?");
+	CQuery query(L"UPDATE [user_item] SET [augmentation] = ?, [mana_left] = ?, [life_time] = ?, [protection_timeout] = ? WHERE [item_id] = ? AND [char_id] = ?");
+	query.AddParam(nAugmentationID);
+	query.AddParam(nManaLeft);
 	query.AddParam(nLifeTime);
 	query.AddParam(nProtectionTimeout);
 	query.AddParam(*pItemDBID);
@@ -3265,15 +3281,17 @@ bool __cdecl PacketHandler::SaveCharacterPacket(CQuerySocket *pSocket, const uns
 	typedef bool (__cdecl *_f)(CQuerySocket*, const unsigned char*);
 	_f f = (_f) 0x00469830;
 
-	int nCharID = 0, nSpiritCount = 0, nHairDeco = 0, nHairAll = 0;
+	int nCharID = 0, nAugmentation = 0, nSpiritCount = 0, nHairDeco = 0, nHairAll = 0;
 	int nEffectiveMana[4]; memset(nEffectiveMana, 0, sizeof(nEffectiveMana));
 	PUCHAR pck = (PUCHAR)(packet + 212);
 	
 	Disassemble(packet, "d", &nCharID);
-	Disassemble(pck, "ddddddd", &nSpiritCount, &nHairDeco, &nHairAll, &nEffectiveMana[0], &nEffectiveMana[1], &nEffectiveMana[2], &nEffectiveMana[3]);
+	Disassemble(pck, "dddddddd", &nAugmentation, &nSpiritCount, &nHairDeco, &nHairAll, &nEffectiveMana[0], &nEffectiveMana[1], &nEffectiveMana[2], &nEffectiveMana[3]);
 	DBConn *pDBConn = new DBConn();
-	pDBConn->Execute(L"UPDATE user_data set spirit_count=%d, ST_hair_deco=%d, ST_hair_all=%d, effective_mana0=%d, effective_mana1=%d, effective_mana2=%d, effective_mana3=%d WHERE char_id = %d", nSpiritCount, nHairDeco, nHairAll, nEffectiveMana[0], nEffectiveMana[1], nEffectiveMana[2], nEffectiveMana[3], nCharID);
+	pDBConn->Execute(L"UPDATE user_data set augmentation=%d, spirit_count=%d, ST_hair_deco=%d, ST_hair_all=%d, effective_mana0=%d, effective_mana1=%d, effective_mana2=%d, effective_mana3=%d WHERE char_id = %d", nAugmentation, nSpiritCount, nHairDeco, nHairAll, nEffectiveMana[0], nEffectiveMana[1], nEffectiveMana[2], nEffectiveMana[3], nCharID);
 	delete pDBConn;
+//	g_Log.AddU(CLog::Blue, L"Save Character[%d] with augmentation[%d]", nCharID, nAugmentation);
+
 
 	return f(pSocket, packet);
 }
@@ -3283,15 +3301,16 @@ int PacketHandler::AssembleLoadCharacterPacket(PCHAR buff, int len, const char* 
 								 DWORD Val39 , DWORD Val40 , DWORD Val41 , DWORD Val42 , DWORD Val43 , DWORD Val44 , DWORD Val45 , DWORD Val46 , DWORD Val47 , DWORD Val48 , DWORD Val49 , DWORD Val50 , DWORD Val51 , DWORD Val52 , DWORD Val53 , DWORD Val54 , DWORD Val55 , DWORD Val56 , DWORD Val57 , DWORD Val58 , DWORD Val59 ,
 								 DWORD Val60 , double Val61 , double Val62 , DWORD Val63 , DWORD Val64 , DWORD Val65 , BYTE Val66)
 {
-	int nHairDecoType = 0, nHairDecoID = 0;
+	int nAugmentation = 0, nHairDecoType = 0, nHairDecoID = 0;
 	int nEffectiveMana[4]; memset(nEffectiveMana, 0, sizeof(nEffectiveMana));
 	DBConn *pDBConn = new DBConn();
+	pDBConn->Bind(&nAugmentation);
 	pDBConn->Bind(&nHairDecoID);
 	pDBConn->Bind(&nEffectiveMana[0]);
 	pDBConn->Bind(&nEffectiveMana[1]);
 	pDBConn->Bind(&nEffectiveMana[2]);
 	pDBConn->Bind(&nEffectiveMana[3]);
-	if(pDBConn->Execute(L"SELECT ST_hair_deco, effective_mana0, effective_mana1, effective_mana2, effective_mana3 FROM user_data where char_id = %d", nCharID))
+	if(pDBConn->Execute(L"SELECT augmentation, ST_hair_deco, effective_mana0, effective_mana1, effective_mana2, effective_mana3 FROM user_data where char_id = %d", nCharID))
 	{
 		pDBConn->Fetch();
 	}
@@ -3327,10 +3346,10 @@ int PacketHandler::AssembleLoadCharacterPacket(PCHAR buff, int len, const char* 
 		}
 	}
 
-	const PCHAR newFormat = "SdSddddddddddffddddddddddddddddddddddddddddddddddddddddddddddddddffdddcdddd";
+	const PCHAR newFormat = "SdSddddddddddffddddddddddddddddddddddddddddddddddddddddddddddddddffdddcddddd";
 
 	return Assemble(buff, len, newFormat, wsName, nCharID, wsAccount, Val1, Val2, Val3, Val4, Val5, Val6, Val7, Val8, Val9, Val10, Val11, Val12, Val13, Val14, Val15, Val16, Val17,
 								 Val18 , Val19 , Val20 , Val21 , Val22 , Val23 , Val24 , Val25 , Val26 , Val27 , Val28 , Val29 , Val30 , Val31 , Val32 , Val33 , Val34 , Val35 , Val36 , Val37 , Val38 ,
 								 Val39 , Val40 , Val41 , nHairDecoID, Val42 , Val43 , Val44 , Val45 , Val46 , Val47 , Val48 , Val49 , Val50 , Val51 , Val52 , Val53 , Val54 , Val55 , Val56 , Val57 , nHairDecoType, Val58 , Val59 ,
-								 Val60 , Val61 , Val62 , Val63 , Val64 , Val65 , Val66, nEffectiveMana[0], nEffectiveMana[1], nEffectiveMana[2], nEffectiveMana[3]);
+								 Val60 , Val61 , Val62 , Val63 , Val64 , Val65 , Val66, nAugmentation, nEffectiveMana[0], nEffectiveMana[1], nEffectiveMana[2], nEffectiveMana[3]);
 }

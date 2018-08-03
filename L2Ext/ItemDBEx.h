@@ -5,12 +5,14 @@ class CItemDBEx;
 class CItemDataEx
 {
 	int item_id;
+	int shadow_time;
 	int reuse_group;
 	friend class CItemDBEx;
 public:
-	CItemDataEx() : item_id(0), reuse_group(0) { }
-	__forceinline void Set(int ItemID, int ReuseGroup) { item_id = ItemID; reuse_group = ReuseGroup; }
+	CItemDataEx() : item_id(0), shadow_time(0), reuse_group(0) { }
+	__forceinline void Set(int ItemID, int ShadowTime, int ReuseGroup) { item_id = ItemID; shadow_time = ShadowTime; reuse_group = ReuseGroup; }
 	__forceinline int GetItemID() { return item_id; };
+	__forceinline int GetShadowTime() { return shadow_time;}
 	__forceinline int GetReuseGroup() { return reuse_group; }
 };
 

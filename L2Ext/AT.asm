@@ -41,7 +41,8 @@ sSpellForce dw 's','p','e','l','l','_','f','o','r','c','e',0 ; 11 id 173
 sBattleForce dw 'b','a','t','t','l','e','_','f','o','r','c','e',0 ;12 id 174
 sInvincibility dw 'i','n','v','i','n','c','i','b','i','l','i','t','y',0 ;13 id 175
 sBattleSymbol dw 'b','a','t','t','l','e','_','s','y','m','b','o','l',0 ;13 id 176
-
+sAugmentation dw 'a','u','g','m','e','n','t','a','t','i','o','n',0; 12 id 177
+sAugmentationTigger dw 'a','u','g','m','e','n','t','a','t','i','o','n','_','t','i','g','g','e','r',0; 19 id 178
 sClanGate dw 'c','l','a','n','_','g','a','t','e',0	;9 id 179
 sOfflineShop dw 'o','f','f','l','i','n','e','_','s','h','o','p',0   ;12 id 180
 sHideBuff dw 'h','i','d','e','_','b','u','f','f',0 ;9 id 181
@@ -343,6 +344,20 @@ ATHook proc
 	mov		ecx, 14
 	repe cmpsw
 	mov		eax, 176
+	cmovz	r8d, eax	
+	
+	lea		rdi, sAugmentation
+	mov		rsi, rdx
+	mov		ecx, 13
+	repe cmpsw
+	mov		eax, 177
+	cmovz	r8d, eax
+	
+	lea		rdi, sAugmentationTigger
+	mov		rsi, rdx
+	mov		ecx, 20
+	repe cmpsw
+	mov		eax, 178
 	cmovz	r8d, eax
 	
 	lea		rdi, sClanGate
@@ -762,6 +777,22 @@ BattleSymbol:
 	lea		rdi, sBattleSymbol
 	mov		rsi, rbp
 	mov		ecx, 14
+	repe cmpsw
+	jnz		short Augmentation
+	mov		dword ptr [rbx+10h], 176
+	jmp		ReturnAddr2	
+Augmentation:
+	lea		rdi, sAugmentation
+	mov		rsi, rbp
+	mov		ecx, 13
+	repe cmpsw
+	jnz		short AugmentationTigger
+	mov		dword ptr [rbx+10h], 177
+	jmp		ReturnAddr2	
+AugmentationTigger:
+	lea		rdi, sAugmentationTigger
+	mov		rsi, rbp
+	mov		ecx, 20
 	repe cmpsw
 	jnz		short ClanGate
 	mov		dword ptr [rbx+10h], 178

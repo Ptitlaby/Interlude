@@ -7,6 +7,7 @@
 #include "TerritoryData.h"
 #include "SchemeBuffer.h"
 #include "TvT.h"
+#include "Augmentation.h"
 #include "MiningSystem.h"
 #include "IpBlocker.h"
 #include "TeleportBypass.h"
@@ -33,6 +34,7 @@ BOOL CMenuExtension::ShowWindowHook(HWND hWnd, int nCmdShow)
 	AppendMenu(hExtMenu, 0, KILL_DEATH_STAT_ID, _T("Switch Kill/Death Stats"));
 	AppendMenu(hExtMenu, 0, RELOAD_ANTI_DDOS, _T("Reload AntiDDoS"));
 	AppendMenu(hExtMenu, 0, RELOAD_ARMOR_PENALTY_ID, _T("Reload Armor Penalty"));
+	AppendMenu(hExtMenu, 0, RELOAD_AUGMENTATION_ID, _T("Reload Augmentation"));
 	AppendMenu(hExtMenu, 0, RELOAD_AUTO_ANNOUNCE, _T("Reload Auto Announce"));
 	AppendMenu(hExtMenu, 0, RELOAD_ALLOWED_HWID, _T("Reload Allowed HWID"));
 	AppendMenu(hExtMenu, 0, RELOAD_BANLIST, _T("Reload BanList"));
@@ -137,6 +139,16 @@ LRESULT CALLBACK CMenuExtension::HandleCommand(HWND hWnd, UINT message, WPARAM w
 		case RELOAD_TERRITORY_DATA_ID:
 			{
 				g_TerritoryChecker.Initialize();
+				return TRUE;
+				break;
+			}
+		case RELOAD_AUGMENTATION_ID:
+			{
+				g_Config.AugmentationInfo.Load();
+				g_Log.Add(CLog::Blue, "Augmentation - Reloaded chances from ini file.");
+				g_Augmentation.ReadSkillData();
+				g_Augmentation.ReadStatData();
+				g_Augmentation.ReadNameData();
 				return TRUE;
 				break;
 			}

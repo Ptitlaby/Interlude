@@ -146,6 +146,7 @@ void CItemDBEx::ReadData()
 			{
 				int ItemID = CParser::GetValueInt(sLine, "item_id");
 				UINT lifeTime = CParser::GetValueInt(sLine, "life_time");
+				int ShadowTime = CParser::GetValueInt(sLine, "shadow_time");
 				int ReuseGroup = CParser::GetValueInt(sLine, "reuse_group", -1);
 				int maxStackableLevel = CParser::GetValueInt(sLine, "max_stackable_level", 0);
 				int stackType = Parser::ParseOptionInt(sLine, "stack_type", 0);
@@ -197,7 +198,7 @@ void CItemDBEx::ReadData()
 						{
 							g_ItemTitleColor.insert(pair<INT32, DWORD>(ItemID, titleColor));
 						}
-						pData->Set(ItemID, ReuseGroup);
+						pData->Set(ItemID, ShadowTime, ReuseGroup);
 						mData.insert(pair<int, CItemDataEx*>(ItemID, pData));
 					}else
 						g_Log.Add(CLog::Error, "[%s] Cannot allocate memory for CItemDataEx!",__FUNCTION__);

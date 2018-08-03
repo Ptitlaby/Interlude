@@ -10,6 +10,7 @@
 #include "PrivateStore.h"
 #include "CursedWeaponSystem.h"
 #include "OlympiadSystem.h"
+#include "Augmentation.h"
 #include "SocketDB.h"
 #include "DB.h"
 #include "AccountDB.h"
@@ -1246,6 +1247,7 @@ void PlayerAction::SaveCharacterInfo(INT64 nCDB, const char *format, ...)
 	User *pUser = g_UserDB.GetUserByDBID(nCharID);
 	if(pUser->ValidUser())
 	{
+		pck.WriteD(pUser->GetAugmentationID());
 		if(g_Config.IsSet(CConfig::SPIRIT_SYSTEM))
 		{
 			pck.WriteD(pUser->pSD->nSpiritCounter);
@@ -1264,6 +1266,7 @@ void PlayerAction::SaveCharacterInfo(INT64 nCDB, const char *format, ...)
 
 	}else
 	{
+		pck.WriteD(NULL); //augmentation
 		pck.WriteD(NULL); //spirit_count
 		pck.WriteD(NULL); //hairdeco
 		pck.WriteD(NULL); //hairall
@@ -1703,7 +1706,16 @@ void PlayerAction::OnPickUpItem(CInventory *pInventory, CItem *pItem, int nChang
 void PlayerAction::OnAddItemToInventory(CInventory *pInventory, CItem *pItem, int nType)
 {
 	User *pUser = pInventory->GetOwner()->GetUser();
-
+	if(nType == CInventory::ADD)
+	{
+		if(pItem->IsValidItem())
+		{
+			if(pUser->ValidUser())
+			{
+				g_Augmentation.MultiSellAddItem(pUser, pItem);
+			}
+		}
+	}
 	pInventory->SetInventoryChanged(pItem, nType);
 	if(nType == CInventory::ADD)
 	{
@@ -1897,6 +1909,7 @@ bool PlayerAction::OnEquipItem(User *pUser, CItem *pItem, int nForce)
 	_EQI EquipItem = (_EQI) 0x008257C0;
 
 	bool bRet = EquipItem(pUser, pItem, nForce);
+	CShadowItem::EquipItem(pUser, pItem);
 
 	return bRet;
 }
@@ -1914,6 +1927,7 @@ bool PlayerAction::OnEnterWorld(User *pUser)
 		
 		pUser->SendQuestList();
 		ClanSys::EnterWorld(pUser);
+		CShadowItem::EnterWorld(pUser);
 
 		SSQSystem::ValidateCpSkill(pUser);
 
@@ -2080,6 +2094,9 @@ bool PlayerAction::OnDropItem(User *pUser, CItem *pItem, int nAmount, FVector *p
 {
 	if(pItem->IsValidItem())
 	{
+		if(pItem->nAugmentationID)
+			return false;
+
 		if(pItem->nProtectionTimeout > time(NULL))
 		{
 			if(pUser->ValidUser())

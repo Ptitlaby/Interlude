@@ -2,6 +2,7 @@
 #include "CreatureAction.h"
 #include "HerbSystem.h"
 #include "VIPSystem.h"
+#include "Augmentation.h"
 #include "HerbSystem.h"
 #include "TerritoryData.h"
 #include "Geo.h"
@@ -1178,6 +1179,7 @@ bool CreatureAction::OnValidateBaseData(CCreature *pCreature)
 
 	if(User *pUser = pCreature->SafeCastUser())
 	{
+		g_Augmentation.ValidateBaseStat(pUser);
 		if(g_RebirthSystem.Enabled())
 		{
 			RebirthUser& ru = pUser->pED->rebirthUser;
@@ -1205,6 +1207,8 @@ void CreatureAction::OnValidateAttachedSkills(CCreature *pCreature)
 		{
 			g_ArmorPenalty.Validate(pUser);
 		}
+		g_Augmentation.ValidateAugmentation(pCreature);
+
 		if(g_RebirthSystem.Enabled())
 		{
 			RebirthUser& ru = pUser->pED->rebirthUser;
@@ -1664,7 +1668,7 @@ void CreatureAction::OnInitializeSkillMod(CCreature *pCreature)
 				pUser->pED->skillDmgMultiplers.clear();
 				pUser->pED->autoCastSkills.clear();
 				pUser->pED->lock.Leave();
-
+				g_Augmentation.SetAugmentationSkillMod(pCreature, pCreature->pSD->nAugmentationID);
 				if(pUser->pED->preserveAbnormalTerritory)
 				{
 					pUser->preserveAbnormals = true;

@@ -67,6 +67,8 @@ void CConfig::ReadData()
 		LogInfo.SetSaveChat( GetPrivateProfileInt(_T("LogSystem"), _T("ChatLog"), 1, g_ConfigFile) );
 		LogInfo.SetBlockOrtReport( GetPrivateProfileInt(_T("LogSystem"), _T("BlockOrtReport"), 1, g_ConfigFile) );
 	}
+	
+	AugmentationInfo.Load();
 }
 
 bool CConfig::IsSet(CConfig::SYSTEM System)
@@ -164,4 +166,45 @@ void CConfig::CAdminSocketInfo::Load()
 	Port = GetPrivateProfileInt(_T("AdminSocket"), _T("Port"), 6891, g_ConfigFile);
 	MaxActiveConnections = GetPrivateProfileInt(_T("AdminSocket"), _T("MaxActiveConnections"), 40, g_ConfigFile);
 	Password = GetPrivateProfileInt(_T("AdminSocket"), _T("Password"), 1234509876, g_ConfigFile);
+}
+
+void CConfig::CAugmentationInfo::Load()
+{
+	lBlockedItem.clear();
+	lBlockedGlow.clear();
+
+	SetBaseStatChance( LOW, GetPrivateProfileInt(_T("Augmentation"), _T("BaseStatLOW"), 0, g_ConfigFile) );
+	SetBaseStatChance( MID, GetPrivateProfileInt(_T("Augmentation"), _T("BaseStatMID"), 1, g_ConfigFile) );
+	SetBaseStatChance( HIGH, GetPrivateProfileInt(_T("Augmentation"), _T("BaseStatHIGH"), 2, g_ConfigFile) );
+	SetBaseStatChance( TOP, GetPrivateProfileInt(_T("Augmentation"), _T("BaseStatTOP"), 2, g_ConfigFile) );
+	SetSkillChance( LOW, GetPrivateProfileInt(_T("Augmentation"), _T("SkillLOW"), 2, g_ConfigFile) );
+	SetSkillChance( MID, GetPrivateProfileInt(_T("Augmentation"), _T("SkillMID"), 3, g_ConfigFile) );
+	SetSkillChance( HIGH, GetPrivateProfileInt(_T("Augmentation"), _T("SkillHIGH"), 5, g_ConfigFile) );
+	SetSkillChance( TOP, GetPrivateProfileInt(_T("Augmentation"), _T("SkillTOP"), 7, g_ConfigFile) );
+	SetDispelOnPassive( GetPrivateProfileInt(_T("Augmentation"), _T("DispelOnPassive"), 0, g_ConfigFile) );
+	SetDispelOnAttribute( GetPrivateProfileInt(_T("Augmentation"), _T("DispelOnAttribute"), 0, g_ConfigFile) );
+
+	TCHAR sString[8192];
+	memset(sString, 0, sizeof(sString));
+	if(GetPrivateProfileString(_T("Augmentation"), _T("BlockItem"), 0, sString, sizeof(sString), g_ConfigFile))
+	{
+		
+		tstringstream sstr;
+		sstr << sString;
+		int nItemID = 0;
+		while(sstr >> nItemID)
+		{
+			AddBlockedItem(nItemID);
+		}
+	}
+	if(GetPrivateProfileString(_T("Augmentation"), _T("BlockGlow"), 0, sString, sizeof(sString), g_ConfigFile))
+	{
+		tstringstream sstr;
+		sstr << sString;
+		int nItemID = 0;
+		while(sstr >> nItemID)
+		{
+			AddBlockedGlow(nItemID);
+		}			
+	}
 }

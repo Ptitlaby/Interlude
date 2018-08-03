@@ -4,6 +4,7 @@
 #include "MenuExtension.h"
 #include "PostLoad.h"
 #include "BuildCmdHandler.h"
+#include "Augmentation.h"
 #include "CreatureAction.h"
 #include "PlayerAction.h"
 #include "NpcAction.h"
@@ -103,6 +104,7 @@ DllExport BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpvRes
 				COtherAction::Initialize();
 				CL2Time::Initialize();
 				BuffSlots::Initialize();
+				g_Augmentation.Initialize();
 				Quests::Initialize();
 				CLogControl::Initialize();
 				CPacketFix::Initialize();

@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Auction.h"
 #include "HtmlCache.h"
+#include "Augmentation.h"
 #include "DB.h"
 
 CAuction g_Auction;
@@ -246,8 +247,8 @@ bool CAuction::RequestSetAuction(User *pUser, int price, int amount)
 
 								pUser->pED->auctionUser.pendingAuction = TRUE;
 								g_DB.RequestDestroyItem(pItem, amount, pUser);
-								g_DB.RequestCreateAuction(pUser->nDBID, pUser->pSD->wszName, pItem->pSID->nItemID, amount, pItem->pSID->nEnchantLevel, price, (time(0) + m_AuctionTime));
-								g_Logger.Add(L"User[%s] - request create auction item[%d] amount[%d] enchant[%d] price[%d]", pUser->pSD->wszName, pItem->pSID->nItemID, amount, pItem->pSID->nEnchantLevel, price);
+								g_DB.RequestCreateAuction(pUser->nDBID, pUser->pSD->wszName, pItem->pSID->nItemID, amount, pItem->pSID->nEnchantLevel, pItem->nAugmentationID, price, (time(0) + m_AuctionTime));
+								g_Logger.Add(L"User[%s] - request create auction item[%d] amount[%d] enchant[%d] augmentation[%d] price[%d]", pUser->pSD->wszName, pItem->pSID->nItemID, amount, pItem->pSID->nEnchantLevel, pItem->nAugmentationID, price);
 								unguard;
 								return true;
 							}else
@@ -343,9 +344,16 @@ bool CAuction::HandleSelectedItem(User *pUser, UINT itemServerId)
 		{
 			if(CItem *pItem = pUser->inventory.GetItemBySID(itemServerId))
 			{
-				if(pItem->nProtectionTimeout > time(0))
+				//check if item isn't augmented etc
+				if(pItem->nAugmentationID != 0 || pItem->nManaLeft != 0 || pItem->nProtectionTimeout > time(0))
 				{
-					if(pItem->nProtectionTimeout)
+					if(pItem->nAugmentationID)
+					{
+						pUser->SendSystemMessage(L"You cannot trade augmented items!");
+					}else if(pItem->nManaLeft)
+					{
+						pUser->SendSystemMessage(L"You cannot trade shadow items!");
+					}else if(pItem->nProtectionTimeout)
 					{
 						pUser->SendSystemMessage(L"You cannot trade protected items!");
 					}
@@ -389,6 +397,7 @@ bool CAuction::HandleSelectedItem(User *pUser, UINT itemServerId)
 				{
 					pUser->pED->auctionUser.itemServerId = itemServerId;
 					pUser->pED->auctionUser.itemClassId = pItem->pSID->nItemID;
+					Augmentation augment(pItem->nAugmentationID);
 					wHtml = Utils::ReplaceString(wHtml, L"<?item_name?>", g_ItemDBEx.GetItemName(pItem->pSID->nItemID), true);
 					wHtml = Utils::ReplaceString(wHtml, L"<?item_sa?>", g_ItemDBEx.GetItemSA(pItem->pSID->nItemID), true);
 					wHtml = Utils::ReplaceString(wHtml, L"<?item_icon?>", g_ItemDBEx.GetItemIcon(pItem->pSID->nItemID), true);
@@ -404,6 +413,8 @@ bool CAuction::HandleSelectedItem(User *pUser, UINT itemServerId)
 					WCHAR wItemAmount[16];
 					_itow_s(pItem->pSID->nItemAmount, wItemAmount, 16, 10);
 					wHtml = Utils::ReplaceString(wHtml, L"<?item_max_amount?>", wItemAmount, true);
+					wHtml = Utils::ReplaceString(wHtml, L"<?item_augmentation1?>", g_Augmentation.GetName(augment.Part.effectA), true);
+					wHtml = Utils::ReplaceString(wHtml, L"<?item_augmentation2?>", g_Augmentation.GetName(augment.Part.effectB), true);
 
 					pUser->ShowBoard(wHtml.c_str());
 				}else
@@ -424,7 +435,7 @@ bool CAuction::HandleSelectedItem(User *pUser, UINT itemServerId)
 	return false;
 }
 
-bool CAuction::Create(UINT sellerId, const WCHAR *sellerName, UINT auctionId, INT32 itemId, INT32 amount, INT32 enchant, INT32 price, UINT expireTime, bool loadOnly)
+bool CAuction::Create(UINT sellerId, const WCHAR *sellerName, UINT auctionId, INT32 itemId, INT32 amount, INT32 enchant, UINT augmentation, INT32 price, UINT expireTime, bool loadOnly)
 {
 	guard;
 
@@ -433,6 +444,7 @@ bool CAuction::Create(UINT sellerId, const WCHAR *sellerName, UINT auctionId, IN
 		AuctionItem ai;
 		ai.auctionTimeoutTime = expireTime;
 		ai.itemAmount = amount;
+		ai.itemAugmentation = Augmentation(augmentation);
 		ai.itemClassId = itemId;
 		ai.itemEnchant = enchant;
 		ai.itemPrice = price;

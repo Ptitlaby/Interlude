@@ -24,10 +24,18 @@ CItem *ClassExtender::CopyItem(CItem *pItem)
 		pReturn = vtt(pItem);
 		if(pReturn)
 		{
+			if(CItemDataEx *pData = g_ItemDBEx.GetItemDataEx(pReturn->pSID->nItemID))
+			{
+				pReturn->nManaLeft = pData->GetShadowTime();
+			}
 			UINT LifeTime = g_ItemDBEx.GetLifeTime(pReturn->pSID->nItemID);
 			if(LifeTime > 0)
 			{
 				pReturn->nLifeTime = time(NULL) + LifeTime;
+			}
+			if(pReturn->IsValidItem() && pItem->IsValidItem())
+			{
+				pReturn->nAugmentationID = pItem->nAugmentationID;
 			}
 			pReturn->nProtectionTimeout = 0;
 		}
@@ -41,6 +49,8 @@ CItem *ClassExtender::CreateItemObject(INT64 nAddr, int nSize, BYTE bOpt, PWCHAR
 	{
 		try
 		{
+			pItem->nAugmentationID = 0;
+			pItem->nManaLeft = 0;
 			pItem->nLifeTime = 0;
 			pItem->nProtectionTimeout = 0;
 		}

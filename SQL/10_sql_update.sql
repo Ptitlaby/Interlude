@@ -1315,7 +1315,15 @@ GO
 USE [lin2world]
 GO
 
+ALTER TABLE dbo.user_data ADD
+	augmentation int NOT NULL DEFAULT 0
+GO
+
 USE [lin2world]
+GO
+
+ALTER TABLE dbo.user_item ADD
+	augmentation int NOT NULL DEFAULT 0
 GO
 
 use lin2world
@@ -2550,6 +2558,7 @@ CREATE TABLE [Auction] (
   [item_id] int DEFAULT (0) NOT NULL,
   [amount] int DEFAULT (0) NOT NULL,
   [enchant] int DEFAULT (0) NOT NULL,
+  [augmentation] int DEFAULT (0) NOT NULL,
   [price] int DEFAULT (0) NOT NULL,
   [expire_time] int DEFAULT (0) NOT NULL
   
@@ -2564,6 +2573,7 @@ CREATE PROCEDURE lin_AuctionCreate
 	@itemId as INT,
 	@amount as INT,
 	@enchant as INT,
+	@augmentation as INT,
 	@price as INT,
 	@expireTime as INT
 )
@@ -2572,7 +2582,7 @@ AS
 SET NOCOUNT ON;
 DECLARE @auctionId int  
 SET @auctionId = 0
-INSERT INTO [Auction] ( seller_id, seller_name, item_id, amount, enchant, price, expire_time ) VALUES (@sellerId, @sellerName, @itemId, @amount, @enchant, @price, @expireTime)
+INSERT INTO [Auction] ( seller_id, seller_name, item_id, amount, enchant, augmentation, price, expire_time ) VALUES (@sellerId, @sellerName, @itemId, @amount, @enchant, @augmentation, @price, @expireTime)
 IF (@@error = 0)  
 BEGIN  
 	SET @auctionId = @@IDENTITY
@@ -2609,7 +2619,7 @@ CREATE PROCEDURE lin_AuctionLoadItems
 AS
 
 SET NOCOUNT ON;
-SELECT [auction_id], [seller_id], [seller_name], [item_id], [amount], [enchant], [price], [expire_time]  FROM [Auction]
+SELECT [auction_id], [seller_id], [seller_name], [item_id], [amount], [enchant], [augmentation], [price], [expire_time]  FROM [Auction]
 GO
 
 CREATE TABLE [AuctionPayment] (

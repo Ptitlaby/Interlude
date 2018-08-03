@@ -415,6 +415,8 @@ public:
 	/* 0838 */ int nPledgeType;
 	/* 083C */ int nCursedVictim;
 	/* 0840 */ int nCursedOwner;
+	/* 0844 */ UINT nAugmentationID;
+	/* 0848 */ UINT nAugmentationTmp;
 	/* 084C */ CDuelInfo DuelInfo;
 	/* 0858 */ UINT nSponsorSID;
 	/* 085C */ UINT nApprenticeSID;

@@ -287,6 +287,19 @@ struct AbnormalData
 
 typedef vector <AbnormalData> AbnormalDataVector;
 
+union Augmentation
+{
+	struct 
+	{
+		USHORT effectA;
+		USHORT effectB;
+	}Part;
+	UINT Full;
+	Augmentation() : Full(0) {};
+	Augmentation(UINT augmentation) : Full(augmentation) {};
+	Augmentation(USHORT first, USHORT second) { Part.effectA = first; Part.effectB = second; };
+};
+
 struct SkillPchIdS
 {
 	BYTE level;

@@ -84,7 +84,7 @@ public:
 	void RequestItemDeliveryAsk(UINT charId);
 	void RequestItemDeliveryDone(UINT charId, UINT jobId);
 	void RequestChangePos(WCHAR* wName, UINT worldId, INT32 x, INT32 y, INT32 z);
-	void RequestCreateAuction(UINT sellerId, const WCHAR* wSeller, int itemId, int amount, int enchant, int price, UINT expireTime);
+	void RequestCreateAuction(UINT sellerId, const WCHAR* wSeller, int itemId, int amount, int enchant, UINT augmentation, int price, UINT expireTime);
 	void RequestModdifyAuctionAmount(UINT auctionId, int newAmount);
 	void RequestDeleteAuction(UINT auctionId);
 	void RequestLoadAuctionItems();

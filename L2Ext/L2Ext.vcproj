@@ -1107,6 +1107,31 @@
 				</Filter>
 			</Filter>
 			<Filter
+				Name="Augmentation"
+				>
+				<File
+					RelativePath=".\Augmentation.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\Augmentation.h"
+					>
+				</File>
+				<File
+					RelativePath=".\augument.asm"
+					>
+					<FileConfiguration
+						Name="Release|x64"
+						>
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="ml64.exe /c /nologo /Fo &quot;$(IntDir)\augument.obj&quot; /Zi &quot;$(InputPath)&quot;&#x0D;&#x0A;"
+							Outputs="$(IntDir)\augument.obj"
+						/>
+					</FileConfiguration>
+				</File>
+			</Filter>
+			<Filter
 				Name="Duel"
 				>
 				<File
@@ -1180,6 +1205,18 @@
 				</File>
 				<File
 					RelativePath=".\Quests.h"
+					>
+				</File>
+			</Filter>
+			<Filter
+				Name="ShadowItem"
+				>
+				<File
+					RelativePath=".\ShadowItem.cpp"
+					>
+				</File>
+				<File
+					RelativePath=".\ShadowItem.h"
 					>
 				</File>
 			</Filter>
@@ -2441,10 +2478,6 @@
 				Name="NpcServer"
 				>
 				<File
-					RelativePath=".\MoveAction.h"
-					>
-				</File>
-				<File
 					RelativePath=".\NpcOpCode.h"
 					>
 				</File>
@@ -3256,6 +3289,10 @@
 			<Filter
 				Name="MoveAction"
 				>
+				<File
+					RelativePath=".\MoveAction.h"
+					>
+				</File>
 			</Filter>
 		</Filter>
 		<Filter
