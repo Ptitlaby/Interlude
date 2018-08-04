@@ -11,7 +11,7 @@ DllExport BOOL WINAPI DllMain(HINSTANCE hInstance, DWORD dwReason, LPVOID lpvRes
 			CachedExt::Initialize();
 			CBuffSlot::Init();
 			CAugmentation::Init();
-			const char* cachedVersion = "$Revision: 453 $";
+			const char* cachedVersion = "$Revision: 454 $";
 			CachedExt::WriteMemoryBYTES(0x528E48, (LPVOID)cachedVersion, 16);
 			break;
 		}

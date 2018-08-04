@@ -301,7 +301,7 @@ void COtherAction::Initialize()
 	g_HookManager.WriteMemoryDWORD(0x737A66, 80);	
 	g_HookManager.WriteMemoryDWORD(0x737F53, 80);
 
-	const char* cachedVersion = "$Revision: 453 $";
+	const char* cachedVersion = "$Revision: 454 $";
 	g_HookManager.WriteMemory(0x9BA080, (LPVOID)cachedVersion, 16);
 
 	if(g_Config.L2ServerConfig.IsExtendClanHallSiege())
